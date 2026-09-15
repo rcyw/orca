@@ -87,6 +87,7 @@ export async function installManagedHooks(options?: {
   signal?: AbortSignal
   hostKeyFingerprint?: string
   agents?: readonly AgentHookTarget[]
+  claudeVersion?: string
 }): Promise<ManagedHookInstallSummary> {
   options?.signal?.throwIfAborted()
   // Why: empty/omitted allowlist fails closed before any home/host probes.
@@ -115,7 +116,8 @@ export async function installManagedHooks(options?: {
           grokHomeDir,
           dshHomeDir,
           signal: options?.signal,
-          agents
+          agents,
+          ...(options?.claudeVersion ? { claudeVersion: options.claudeVersion } : {})
         }
       )
       return {

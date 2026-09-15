@@ -73,6 +73,11 @@ describe('agent session resume metadata', () => {
     ['claude', { key: 'session_id', id: 's1' }, ['claude', '--resume', 's1']],
     ['codex', { key: 'session_id', id: 's1' }, ['codex', 'resume', 's1']],
     ['dsh-console', { key: 'session_id', id: 's1' }, ['dsh-console', '--resume', 's1']],
+    [
+      'dsh-console',
+      { key: 'session_id', id: 'dsh-console-fork-123' },
+      ['dsh-console', '--resume', 'dsh-console-fork-123']
+    ],
     ['gemini', { key: 'session_id', id: 's1' }, ['gemini', '--resume', 's1']],
     ['antigravity', { key: 'conversation_id', id: 's1' }, ['agy', '--conversation', 's1']],
     ['opencode', { key: 'session_id', id: 's1' }, ['opencode', '--session', 's1']],

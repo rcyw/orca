@@ -292,7 +292,7 @@ export function recognizeAgentProcessFromCommandLine(
   const firstNormalized = normalizeProcessName(tokens[0])
   let direct = isDshConsoleProcess(tokens[0] ?? '', tokens.slice(1))
     ? { agent: 'dsh-console' as const, processName: 'dsh-console' }
-    : recognizeAgentProcess(tokens[0])
+    : recognizedAgentForProcess(firstNormalized)
   // Why: the generic Orca CLI is not an agent; only this subcommand launches its TUI mode.
   if (direct?.agent === 'claude-agent-teams' && tokens[1]?.toLowerCase() !== 'claude-teams') {
     direct = null

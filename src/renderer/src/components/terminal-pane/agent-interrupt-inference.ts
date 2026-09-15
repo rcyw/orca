@@ -4,6 +4,7 @@ import {
 } from '../../../../shared/agent-status-types'
 import {
   AGENT_INTERRUPT_SETTLE_MS,
+  isNavigationEscapeIntent,
   type AgentInterruptInferenceRequest,
   type AgentInterruptInputIntent
 } from '../../../../shared/agent-interrupt-intent'
@@ -61,6 +62,16 @@ function shouldIgnoreInterruptIntent(
 ): boolean {
   // DSH Escape edits input; only a real aborted-turn event proves Ctrl+C completed.
   return agentType === 'dsh-console' || (agentType === 'droid' && intent === 'ctrl-c')
+}
+
+/** Why: skip a round-trip main will refuse anyway. Scoped to 'working' so Claude's
+ *  AskUserQuestion dismissal — a 'waiting' row — still reaches inferQuestionAnswered. */
+function isIgnorableNavigationEscape(
+  agentType: AgentStatusEntry['agentType'],
+  intent: AgentInterruptInputIntent,
+  state: AgentStatusEntry['state']
+): boolean {
+  return state === 'working' && isNavigationEscapeIntent(agentType, intent)
 }
 
 function canInferInterrupt(entry: AgentStatusEntry, intent: AgentInterruptInputIntent): boolean {
@@ -237,6 +248,11 @@ export function createAgentInterruptInference({
       }
       if (shouldIgnoreInterruptIntent(baseline.agentType, intent)) {
         clearPending()
+        return
+      }
+      // Why: this keypress proves nothing, but it must not revoke a Ctrl+C already waiting to
+      // settle — the user really did ask to interrupt, and Escape does not take that back.
+      if (isIgnorableNavigationEscape(baseline.agentType, intent, entry.state)) {
         return
       }
       if (requiresDoubleEscapeForAgent(baseline.agentType, intent)) {
